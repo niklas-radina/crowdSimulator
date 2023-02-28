@@ -29,12 +29,12 @@ public class AgentControl : MonoBehaviour
         
         agent.angularSpeed = 120.0f;
         if(agent.speed > 0) {
-            state = AgentManager.AM.roamingState;
+            state = AgentManager.AM.RoamingState;
             isRoaming = false;
             
             SetRandomSpeedAndRoamingTarget();
         } else {
-            state = AgentManager.AM.idleState;
+            state = AgentManager.AM.IdleState;
             isRoaming = false;
         }
 
@@ -62,7 +62,7 @@ public class AgentControl : MonoBehaviour
         if (Vector3.Distance(position, this.transform.position) < detectionRadius)
         {
             isRoaming = false;
-            state = AgentManager.AM.evacuatingState;
+            state = AgentManager.AM.EvacuatingState;
             agent.SetDestination(this.GetClosestExit().transform.position);
             SetRandomSpeedInSpeedRange();
             agentRenderer.material = evacuatingMaterial;

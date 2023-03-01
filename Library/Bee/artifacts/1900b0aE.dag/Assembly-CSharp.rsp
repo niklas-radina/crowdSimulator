@@ -346,9 +346,14 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEditor.UI.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll"
 "Assets/Scripts/AgentControl.cs"
+"Assets/Scripts/AgentControlHelperFunctions.cs"
 "Assets/Scripts/AgentManager.cs"
 "Assets/Scripts/AgentState.cs"
 "Assets/Scripts/DropCylinder.cs"
+"Assets/Scripts/Flock.cs"
+"Assets/Scripts/FlockManager.cs"
+"Assets/Scripts/ObjectMangers/SceneObjectManager.cs"
+"Assets/Scripts/ObjectMangers/ScriptObjectManager.cs"
 -langversion:9.0
 
 /deterministic

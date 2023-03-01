@@ -11,12 +11,10 @@ GameObject:
   - component: {fileID: 3171152513957968636}
   - component: {fileID: 1602680389083866989}
   - component: {fileID: 3636891501343589348}
-  - component: {fileID: 5807212484038686412}
   - component: {fileID: 789977350082090351}
-  - component: {fileID: 1055396647637152294}
   m_Layer: 0
   m_Name: AgentRoming
-  m_TagString: agent
+  m_TagString: roamingAgent
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -86,20 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5807212484038686412
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5834048707304560864}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!195 &789977350082090351
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -122,17 +106,3 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &1055396647637152294
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5834048707304560864}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 844757cd9b8849442ae85d4385124a8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  evacuatingMaterial: {fileID: 2100000, guid: 05fb4142f3c91ef49bd9dcbb453fe896, type: 2}
-  panicMaterial: {fileID: 2100000, guid: 14f4d8c68108b9e4386bbb4a5326ca40, type: 2}

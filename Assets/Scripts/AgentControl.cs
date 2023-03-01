@@ -1,109 +1,104 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.AI;
+using ACHF = AgentControlHelperFunctions;
 
 public class AgentControl : MonoBehaviour
 {
-    public Material evacuatingMaterial;
-    public Material panicMaterial;
+    private readonly float _detectionRadius = 20.0f;
 
-    GameObject[] exitLocations;
-    GameObject[] roamingTargets;
-    NavMeshAgent agent;
-    AgentState state;
-    Renderer agentRenderer;
+    private NavMeshAgent _agent;
+    private Renderer _agentRenderer;
+    private AgentManager _am;
+    private bool _didInititalize;
 
 
-    float detectionRadius = 20.0f;
     // float fleeRadius = 10.0f;
-    bool isRoaming;
+    private bool _isRoaming;
+    [CanBeNull] private AgentState _nextState;
+    private SceneObjectManager _sceneOM;
+    private ScriptObjectManager _scriptOM;
+    private AgentState _state;
 
 
-    void Start()
+    private void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
-        agentRenderer = GetComponent<Renderer>();
-        exitLocations = GameObject.FindGameObjectsWithTag("exit");
-        roamingTargets = GameObject.FindGameObjectsWithTag("roamingTarget");
-        
-        agent.angularSpeed = 120.0f;
-        if(agent.speed > 0) {
-            state = AgentManager.AM.RoamingState;
-            isRoaming = false;
-            
-            SetRandomSpeedAndRoamingTarget();
-        } else {
-            state = AgentManager.AM.IdleState;
-            isRoaming = false;
-        }
+        _agent = GetComponent<NavMeshAgent>();
+        _agentRenderer = GetComponent<Renderer>();
 
+        _agent.angularSpeed = 120.0f;
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (agent.remainingDistance < 1.0f)
+        if (_nextState != null)
         {
-            if (isRoaming)
-            {
-                SetRandomSpeedAndRoamingTarget();
-            }
-            else
-            {
-                agent.speed = 0;
-            }
+            NewState(_nextState);
+            _nextState = null;
+        }
 
+        if (_agent.remainingDistance < 1.0f)
+        {
+            if (_isRoaming)
+                ACHF.ContinueRoaming(_agent, _scriptOM, _sceneOM);
+            else
+                _agent.speed = 0;
+        }
+    }
+
+    public void SetObjectManagerAndInitialize(SceneObjectManager sceneOM, ScriptObjectManager scriptOM)
+
+    {
+        _sceneOM = sceneOM;
+        _scriptOM = scriptOM;
+        if (_nextState == null)
+        {
+            _state = _scriptOM.IdleState;
+            _isRoaming = false;
+        }
+        else
+        {
+            NewState(_nextState);
+        }
+    }
+
+    public void SetStateForNextFrame(AgentState state)
+    {
+        if (_state == state) return;
+        _nextState = state;
+    }
+
+    private void NewState(AgentState state)
+    {
+        _state = state;
+        switch (state.StateName)
+        {
+            case "idle":
+                ACHF.BeIdle(_agent, transform.position, _agentRenderer, _sceneOM);
+                _isRoaming = false;
+                break;
+            case "roaming":
+                ACHF.StartRoaming(_agent, _agentRenderer, _scriptOM, _sceneOM);
+                _isRoaming = true;
+                break;
+            case "evacuating":
+                ACHF.StartEvacuating(_agent, _agentRenderer, transform.position, _sceneOM, _scriptOM);
+                _isRoaming = false;
+                break;
+            case "panicking":
+                _isRoaming = false;
+                break;
+            default:
+                Debug.LogException(new Exception($"Agent was provided with unknown AgentState: {state}"));
+                break;
         }
     }
 
     public void DetectNewObstacle(Vector3 position)
     {
-        if (Vector3.Distance(position, this.transform.position) < detectionRadius)
-        {
-            isRoaming = false;
-            state = AgentManager.AM.EvacuatingState;
-            agent.SetDestination(this.GetClosestExit().transform.position);
-            SetRandomSpeedInSpeedRange();
-            agentRenderer.material = evacuatingMaterial;
-        }
+        if (Vector3.Distance(position, transform.position) < _detectionRadius)
+            NewState(_scriptOM.EvacuatingState);
     }
-
-    GameObject GetClosestExit()
-    {
-        float currentDistance = 99999.0f;
-        GameObject closestExit = this.exitLocations[0];
-        foreach (GameObject exit in this.exitLocations)
-        {
-            float distance = Vector3.Distance(exit.transform.position, this.transform.position);
-            if (distance < currentDistance)
-            {
-                closestExit = exit;
-                currentDistance = distance;
-            }
-        }
-
-        return closestExit;
-    }
-
-    void SetRandomSpeedAndRoamingTarget()
-    {
-        float speedMult = Random.Range(0.5f, 1.5f);
-        agent.speed *= speedMult;
-        if (agent.speed > state.SpeedRange.max) {
-            agent.speed = state.SpeedRange.max;
-        } else if (agent.speed < state.SpeedRange.min) {
-            agent.speed = state.SpeedRange.min;
-        }
-
-        int i = Random.Range(0, roamingTargets.Length);
-        agent.SetDestination(roamingTargets[i].transform.position);
-    }
-
-    void SetRandomSpeedInSpeedRange()
-    {
-        agent.speed = Random.Range(state.SpeedRange.min, state.SpeedRange.max);
-    }
-
 }
-
